@@ -2,12 +2,40 @@
   <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Header -->
-      <div class="text-center mb-12">
+      <div class="text-center mb-8">
         <h1 class="text-4xl font-bold text-gray-900 mb-4">
-          Blog Articles
+            Blog Articles
         </h1>
         <p class="text-xl text-gray-600">
           Découvrez les derniers articles de notre communauté
+        </p>
+      </div>
+
+      <!-- NOUVEAU : Barre de recherche -->
+      <div class="mb-8 max-w-2xl mx-auto">
+        <div class="relative">
+          <input
+            v-model="searchQuery"
+            @input="handleSearch"
+            type="text"
+            placeholder="Rechercher un article..."
+            class="w-full px-6 py-4 pl-12 text-lg border border-gray-300 rounded-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition shadow-sm"
+          />
+          <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <button
+            v-if="searchQuery"
+            @click="clearSearch"
+            class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <p v-if="searchQuery" class="mt-2 text-sm text-gray-600 text-center">
+          {{ posts.length }} résultat(s) pour "{{ searchQuery }}"
         </p>
       </div>
 
@@ -17,7 +45,7 @@
           @click="filterByCategory(null)"
           :class="[
             'px-4 py-2 rounded-full font-medium transition',
-            selectedCategory === null
+            selectedCategory === null && !searchQuery
               ? 'bg-indigo-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100'
           ]"
@@ -30,11 +58,11 @@
           @click="filterByCategory(category)"
           :class="[
             'px-4 py-2 rounded-full font-medium transition',
-            selectedCategory?.id === category.id
+            selectedCategory?.id === category.id && !searchQuery
               ? 'text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100'
           ]"
-          :style="selectedCategory?.id === category.id ? { backgroundColor: category.color } : {}"
+          :style="selectedCategory?.id === category.id && !searchQuery ? { backgroundColor: category.color } : {}"
         >
           {{ category.name }} ({{ category.posts_count }})
         </button>
@@ -94,9 +122,24 @@
 
       <!-- Aucun article -->
       <div v-else class="text-center py-20">
-        <p class="text-gray-500 text-lg">
-          {{ selectedCategory ? `Aucun article dans la catégorie "${selectedCategory.name}"` : 'Aucun article pour le moment' }}
+        <svg class="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="text-gray-500 text-lg mb-2">
+          {{ searchQuery 
+            ? `Aucun article trouvé pour "${searchQuery}"` 
+            : selectedCategory 
+              ? `Aucun article dans la catégorie "${selectedCategory.name}"` 
+              : 'Aucun article pour le moment' 
+          }}
         </p>
+        <button
+          v-if="searchQuery || selectedCategory"
+          @click="clearAll"
+          class="mt-4 text-indigo-600 hover:text-indigo-700 font-semibold"
+        >
+          Voir tous les articles
+        </button>
       </div>
     </div>
   </div>
@@ -105,14 +148,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getPosts, getCategories, getCategoryPosts } from '@/services/api'
+import { getPosts, getCategories, getCategoryPosts, searchPosts } from '@/services/api'
 
 const router = useRouter()
 
 const posts = ref([])
 const categories = ref([])
 const selectedCategory = ref(null)
+const searchQuery = ref('') // NOUVEAU
 const loading = ref(true)
+let searchTimeout = null // NOUVEAU : Pour le debounce
 
 const fetchCategories = async () => {
   try {
@@ -136,15 +181,14 @@ const fetchPosts = async () => {
 }
 
 const filterByCategory = async (category) => {
+  searchQuery.value = '' // Réinitialiser la recherche
   selectedCategory.value = category
   loading.value = true
 
   try {
     if (category === null) {
-      // Tous les articles
       await fetchPosts()
     } else {
-      // Articles d'une catégorie spécifique
       const response = await getCategoryPosts(category.slug)
       posts.value = response.data.data.data || response.data.data
     }
@@ -153,6 +197,50 @@ const filterByCategory = async (category) => {
   } finally {
     loading.value = false
   }
+}
+
+// NOUVEAU : Fonction de recherche avec debounce
+const handleSearch = () => {
+  // Annuler le timeout précédent
+  if (searchTimeout) {
+    clearTimeout(searchTimeout)
+  }
+
+  // Si la recherche est vide, afficher tous les articles
+  if (searchQuery.value.trim() === '') {
+    fetchPosts()
+    selectedCategory.value = null
+    return
+  }
+
+  // Attendre 500ms après que l'utilisateur arrête de taper
+  searchTimeout = setTimeout(async () => {
+    loading.value = true
+    selectedCategory.value = null
+
+    try {
+      const response = await searchPosts(searchQuery.value)
+      posts.value = response.data.data.data || response.data.data
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error)
+      posts.value = []
+    } finally {
+      loading.value = false
+    }
+  }, 500)
+}
+
+// NOUVEAU : Effacer la recherche
+const clearSearch = () => {
+  searchQuery.value = ''
+  fetchPosts()
+}
+
+// NOUVEAU : Tout effacer
+const clearAll = () => {
+  searchQuery.value = ''
+  selectedCategory.value = null
+  fetchPosts()
 }
 
 const goToPost = (id) => {

@@ -138,4 +138,31 @@ class PostController extends Controller
             'data' => $posts
         ], Response::HTTP_OK);
     }
+
+    // GET /api/posts/search?q=laravel - Rechercher des articles
+public function search(Request $request)
+{
+    $query = $request->input('q', '');
+
+    if (empty($query)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Veuillez fournir un terme de recherche'
+        ], Response::HTTP_BAD_REQUEST);
+    }
+
+    $posts = Post::with('user', 'category')
+        ->where(function ($q) use ($query) {
+            $q->where('title', 'like', '%' . $query . '%')
+              ->orWhere('content', 'like', '%' . $query . '%');
+        })
+        ->paginate(10);
+
+    return response()->json([
+        'success' => true,
+        'query' => $query,
+        'data' => $posts
+    ], Response::HTTP_OK);
+}
+
 }

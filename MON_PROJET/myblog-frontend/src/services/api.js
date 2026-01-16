@@ -71,6 +71,13 @@ export const getMyPosts = () => {
 }
 
 
+// ========== RECHERCHE ==========
+
+export const searchPosts = (query) => {
+  return api.get('/posts/search', { params: { q: query } })
+}
+
+
 // ========== CATÉGORIES ==========
 
 export const getCategories = () => {

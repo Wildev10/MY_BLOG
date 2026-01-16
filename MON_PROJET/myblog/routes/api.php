@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoryController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/posts', [PostController::class, 'index']); // Liste des articles accessible à tous
+Route::get('/posts/search', [PostController::class, 'search']);
 Route::get('/posts/{id}', [PostController::class, 'show']); // Voir un article accessible à tous
 Route::get('/categories', [CategoryController::class, 'index']); // Liste des catégories
 Route::get('/categories/{slug}/posts', [CategoryController::class, 'posts']); // Articles d'une catégorie
