@@ -59,6 +59,9 @@
       <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 text-sm">
         <p>&copy; {{ currentYear }} MyBlog. Tous droits réservés.</p>
         <p class="mt-2">
+          Créé par <span class="text-white font-medium">Wilfried Deguenon</span>
+        </p>
+        <p class="mt-1">
           Fait avec Vue.js & Laravel
         </p>
       </div>
