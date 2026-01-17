@@ -36,13 +36,11 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // S'inscrire
+  // S'inscrire (sans connexion automatique)
   const register = async (name, email, password, password_confirmation) => {
     try {
-      const response = await apiRegister(name, email, password, password_confirmation)
-      token.value = response.data.data.token
-      user.value = response.data.data.user
-      localStorage.setItem('token', token.value)
+      await apiRegister(name, email, password, password_confirmation)
+      // Ne pas stocker le token - l'utilisateur devra se connecter manuellement
       return { success: true }
     } catch (error) {
       let errorMessage = 'Erreur d\'inscription'

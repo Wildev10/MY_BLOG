@@ -182,8 +182,8 @@ const handleRegister = async () => {
     )
     
     if (result.success) {
-      // L'inscription connecte automatiquement, rediriger vers l'accueil
-      router.push('/')
+      // Inscription réussie, rediriger vers la page de connexion
+      router.push('/login')
     } else {
       errorMessage.value = result.message
     }
