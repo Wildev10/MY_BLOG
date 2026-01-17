@@ -48,6 +48,33 @@
           </div>
         </div>
 
+        <!-- NOUVEAU : Bouton Like -->
+    <div class="mt-6 flex items-center gap-4">
+      <button
+        v-if="authStore.isAuthenticated"
+        @click="handleLike"
+        class="flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition"
+        :class="post.is_liked 
+          ? 'bg-red-500 text-white hover:bg-red-600' 
+          : 'bg-white/20 text-white hover:bg-white/30'"
+      >
+        <svg class="w-6 h-6" :fill="post.is_liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+        <span>{{ post.is_liked ? 'J\'aime' : 'Aimer' }}</span>
+        <span class="bg-white/20 px-2 py-1 rounded-full text-sm">
+          {{ post.likes_count || 0 }}
+        </span>
+      </button>
+      
+      <span v-else class="flex items-center gap-2 text-white/70 text-sm">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+        {{ post.likes_count || 0 }} j'aime
+      </span>
+    </div>
+
         <!-- Contenu -->
         <div class="px-8 py-12">
           <div class="prose prose-lg max-w-none">
@@ -92,7 +119,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { getPost, deletePost } from '@/services/api'
+import { getPost, deletePost, toggleLike } from '@/services/api'
 
 const router = useRouter()
 const route = useRoute()
@@ -149,4 +176,15 @@ const formatDate = (dateString) => {
 onMounted(() => {
   fetchPost()
 })
+
+// NOUVEAU : Fonction like
+const handleLike = async () => {
+  try {
+    const response = await toggleLike(post.value.id)
+    post.value.is_liked = response.data.liked
+    post.value.likes_count = response.data.likes_count
+  } catch (error) {
+    console.error('Erreur:', error)
+  }
+}
 </script>

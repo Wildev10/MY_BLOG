@@ -9,10 +9,21 @@ use Illuminate\Http\Response;
 class PostController extends Controller
 {
     // GET /api/posts - Lister TOUS les articles (avec pagination)
-    public function index()
+    public function index(Request $request)
     {
         // On récupère 10 articles par page, avec les infos de l'auteur et de la catégorie
-        $posts = Post::with(['user', 'category'])->paginate(10);
+        $posts = Post::with(['user', 'category'])
+        ->withCount('likes')
+        ->paginate(10);
+
+           // NOUVEAU : Ajouter si l'utilisateur connecté a liké chaque post
+        if ($request->user()) {
+            $userId = $request->user()->id;
+            $posts->getCollection()->transform(function ($post) use ($userId) {
+                $post->is_liked = $post->isLikedBy($userId);
+                return $post;
+            });
+        }
 
         return response()->json([
             'success' => true,
@@ -44,10 +55,12 @@ class PostController extends Controller
     }
 
     // GET /api/posts/{id} - Voir UN article spécifique
-    public function show($id)
+    public function show(Request $request, $id)
     {
         // On cherche l'article avec son auteur et sa catégorie
-        $post = Post::with(['user', 'category'])->find($id);
+        $post = Post::with(['user', 'category'])
+        ->withCount('likes')
+        ->find($id);
 
         // Si l'article n'existe pas, on retourne une erreur 404
         if (!$post) {
@@ -55,6 +68,12 @@ class PostController extends Controller
                 'success' => false,
                 'message' => 'Article non trouvé'
             ], Response::HTTP_NOT_FOUND);
+        }
+         // NOUVEAU : Vérifier si l'utilisateur connecté a liké
+        if ($request->user()) {
+            $post->is_liked = $post->isLikedBy($request->user()->id);
+        } else {
+            $post->is_liked = false;
         }
 
         return response()->json([

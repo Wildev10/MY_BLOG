@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\LikeController;
 
 // Routes PUBLIQUES (pas besoin d'être connecté)
 Route::post('/register', [AuthController::class, 'register']);
@@ -29,4 +30,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Categories (admin uniquement)
     Route::post('/categories', [CategoryController::class, 'store']); // Créer une catégorie
+
+    // NOUVEAU : Likes
+     Route::post('/posts/{id}/like', [LikeController::class, 'toggle']);
+     Route::get('/posts/{id}/likes', [LikeController::class, 'getLikes']);
 });

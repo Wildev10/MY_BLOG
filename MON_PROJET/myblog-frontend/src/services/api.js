@@ -92,5 +92,15 @@ export const getCategoryPosts = (slug) => {
   return api.get(`/categories/${slug}/posts`)
 }
 
+// ========== LIKES ==========
+
+export const toggleLike = (postId) => {
+  return api.post(`/posts/${postId}/like`)
+}
+
+export const getLikes = (postId) => {
+  return api.get(`/posts/${postId}/likes`)
+}
+
 
 export default api

@@ -52,4 +52,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Post::class);
     }
+
+    // NOUVEAU : Relation : Un utilisateur peut avoir plusieurs likes
+        public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
 }

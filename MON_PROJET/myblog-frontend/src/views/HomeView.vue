@@ -101,21 +101,43 @@
             <p class="text-gray-600 mb-4 line-clamp-3">
               {{ post.content }}
             </p>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                  <span class="text-indigo-600 font-semibold text-sm">
-                    {{ post.user?.name?.charAt(0) || '?' }}
-                  </span>
-                </div>
-                <span class="ml-2 text-sm text-gray-700 font-medium">
-                  {{ post.user?.name || 'Anonyme' }}
-                </span>
-              </div>
-              <span class="text-xs text-gray-500">
-                {{ formatDate(post.created_at) }}
-              </span>
-            </div>
+                  <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+            <span class="text-indigo-600 font-semibold text-sm">
+              {{ post.user?.name?.charAt(0) || '?' }}
+            </span>
+          </div>
+          <span class="text-sm text-gray-700 font-medium">
+            {{ post.user?.name || 'Anonyme' }}
+          </span>
+        </div>
+        
+        <!-- NOUVEAU : Bouton Like -->
+        <div class="flex items-center gap-4">
+          <button
+            v-if="authStore.isAuthenticated"
+            @click.stop="handleLike(post)"
+            class="flex items-center gap-1 text-sm transition"
+            :class="post.is_liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'"
+          >
+            <svg class="w-5 h-5" :fill="post.is_liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            <span class="font-medium">{{ post.likes_count || 0 }}</span>
+          </button>
+          <span v-else class="flex items-center gap-1 text-gray-400 text-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            <span class="text-sm">{{ post.likes_count || 0 }}</span>
+          </span>
+          
+          <span class="text-xs text-gray-500">
+            {{ formatDate(post.created_at) }}
+          </span>
+        </div>
+      </div>
           </div>
         </div>
       </div>
@@ -148,9 +170,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getPosts, getCategories, getCategoryPosts, searchPosts } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
+import { getPosts, getCategories, getCategoryPosts, searchPosts, toggleLike } from '@/services/api'
 
 const router = useRouter()
+const authStore = useAuthStore() 
 
 const posts = ref([])
 const categories = ref([])
@@ -229,6 +253,23 @@ const handleSearch = () => {
     }
   }, 500)
 }
+
+
+  // NOUVEAU : Fonction pour liker/unliker
+  const handleLike = async (post) => {
+    try {
+      const response = await toggleLike(post.id)
+      
+      // Mettre à jour localement
+      post.is_liked = response.data.liked
+      post.likes_count = response.data.likes_count
+    } catch (error) {
+      console.error('Erreur lors du like:', error)
+      if (error.response?.status === 401) {
+        router.push('/login')
+      }
+    }
+  }
 
 // NOUVEAU : Effacer la recherche
 const clearSearch = () => {
