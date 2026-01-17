@@ -174,14 +174,19 @@ const handleRegister = async () => {
   errorMessage.value = ''
 
   try {
-    await authStore.register(
+    const result = await authStore.register(
       name.value,
       email.value,
       password.value,
       passwordConfirmation.value
     )
-    // Rediriger vers la page de connexion après inscription réussie
-    router.push('/login')
+    
+    if (result.success) {
+      // L'inscription connecte automatiquement, rediriger vers l'accueil
+      router.push('/')
+    } else {
+      errorMessage.value = result.message
+    }
   } catch (error) {
     if (error.response?.data?.message) {
       errorMessage.value = error.response.data.message
