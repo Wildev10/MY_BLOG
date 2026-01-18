@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -38,8 +39,15 @@ class PostController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255', // Titre obligatoire
             'content' => 'required|string',       // Contenu obligatoire
-            'category_id' => 'nullable|exists:categories,id' // Catégorie optionnelle
+            'category_id' => 'nullable|exists:categories,id', // Catégorie optionnelle
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048' // Image optionnelle
         ]);
+
+          // NOUVEAU : Gérer l'upload de l'image
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('posts', 'public');
+            $validated['image'] = $path;
+        }
 
         // Création automatique : L'article est lié à l'utilisateur connecté
         $post = $request->user()->posts()->create($validated);
@@ -105,8 +113,29 @@ class PostController extends Controller
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
             'content' => 'sometimes|string',
-            'category_id' => 'nullable|exists:categories,id'
+            'category_id' => 'nullable|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
         ]);
+
+        // NOUVEAU : Gérer l'upload de la nouvelle image
+        if ($request->hasFile('image')) {
+            // Supprimer l'ancienne image si elle existe
+            if ($post->image) {
+                Storage::disk('public')->delete($post->image);
+            }
+
+            $path = $request->file('image')->store('posts', 'public');
+            $validated['image'] = $path;
+        }
+
+        // NOUVEAU : Gérer la suppression d'image
+        if ($request->input('remove_image') === '1') {
+            if ($post->image) {
+                Storage::disk('public')->delete($post->image);
+            }
+            $validated['image'] = null;
+        }
+
 
         $post->update($validated);
         $post->load('user' , 'category');
@@ -136,6 +165,11 @@ class PostController extends Controller
                 'success' => false,
                 'message' => 'Vous n\'êtes pas autorisé à supprimer cet article'
             ], Response::HTTP_FORBIDDEN);
+        }
+
+        // NOUVEAU : Supprimer l'image si elle existe
+        if ($post->image) {
+            Storage::disk('public')->delete($post->image);
         }
 
         $post->delete();

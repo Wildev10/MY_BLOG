@@ -9,7 +9,9 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'content', 'user_id', 'category_id']; // ← Ajoutez category_id
+    protected $fillable = ['title', 'content', 'user_id', 'category_id' , 'image']; // ← Ajoutez category_id
+
+    protected $appends = ['image_url'];
 
     // Relation : Un post appartient à un utilisateur
     public function user()
@@ -45,5 +47,15 @@ class Post extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class)->latest();
+    }
+
+    // Accessor pour l'URL complète de l'image
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        return asset('storage/' . $this->image);
     }
 }

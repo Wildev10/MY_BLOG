@@ -84,6 +84,16 @@
           class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition duration-300 overflow-hidden cursor-pointer border border-transparent dark:border-gray-700"
           @click="goToPost(post.id)"
         >
+        
+          <!-- NOUVEAU : Image de l'article -->
+        <div v-if="post.image_url" class="w-full h-48 overflow-hidden">
+          <img 
+            :src="post.image_url" 
+            :alt="post.title"
+            class="w-full h-full object-cover hover:scale-105 transition duration-300"
+          />
+        </div>
+
           <div class="p-6">
             <!-- Badge catégorie -->
             <div v-if="post.category" class="mb-3">

@@ -1,7 +1,7 @@
 <template>
   <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
     <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-      💬 Commentaires ({{ comments.length }})
+      Commentaires ({{ comments.length }})
     </h3>
 
     <!-- Formulaire d'ajout de commentaire -->
@@ -135,7 +135,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { getComments, createComment, updateComment, deleteComment } from '@/services/api'
 
@@ -166,6 +166,13 @@ const fetchComments = async () => {
     loading.value = false
   }
 }
+
+// Recharger les commentaires quand le postId change
+watch(() => props.postId, (newPostId, oldPostId) => {
+  if (newPostId !== oldPostId) {
+    fetchComments()
+  }
+}, { immediate: false })
 
 const handleSubmit = async () => {
   if (!newComment.value.trim()) return

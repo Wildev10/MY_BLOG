@@ -54,14 +54,24 @@ export const getPost = (id) => {
   return api.get(`/posts/${id}`)
 }
 
-export const createPost = (title, content, category_id ) => {
-  return api.post('/posts', { title, content, category_id })
+export const createPost = (formData) => {
+  return api.post('/posts', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
 }
 
-export const updatePost = (id, title, content, category_id = null) => {
-  return api.put(`/posts/${id}`, { title, content, category_id })
-}
 
+export const updatePost = (id, formData) => {
+  // Pour Laravel, on doit utiliser POST avec _method=PUT pour les fichiers
+  formData.append('_method', 'PUT')
+  return api.post(`/posts/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
 export const deletePost = (id) => {
   return api.delete(`/posts/${id}`)
 }

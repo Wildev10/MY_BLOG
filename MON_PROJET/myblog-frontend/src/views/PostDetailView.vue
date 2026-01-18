@@ -75,6 +75,16 @@
       </span>
     </div>
 
+     
+        <!-- NOUVEAU : Image de l'article -->
+        <div v-if="post.image_url" class="w-full">
+          <img 
+            :src="post.image_url" 
+            :alt="post.title"
+            class="w-full max-h-96 object-cover"
+          />
+        </div>
+
         <!-- Contenu -->
         <div class="px-8 py-12">
           <div class="prose prose-lg max-w-none">
@@ -102,7 +112,7 @@
       </article>
 
       <!-- NOUVEAU : Section Commentaires -->
-      <CommentSection v-if="post" :post-id="post.id" class="mt-8" />
+      <CommentSection v-if="post" :key="`comments-${post.id}-${commentKey}`" :post-id="post.id" class="mt-8" />
 
       <!-- Erreur -->
       <div v-else class="text-center py-20">
@@ -119,8 +129,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getPost, deletePost, toggleLike } from '@/services/api'
 import CommentSection from '@/components/CommentSection.vue' 
@@ -131,21 +141,39 @@ const authStore = useAuthStore()
 
 const post = ref(null)
 const loading = ref(true)
+const commentKey = ref(0) // Clé pour forcer le rechargement des commentaires
 
 const isAuthor = computed(() => {
   return authStore.user && post.value && authStore.user.id === post.value.user_id
 })
 
 const fetchPost = async () => {
+  loading.value = true
   try {
     const response = await getPost(route.params.id)
     post.value = response.data.data
+    // Incrémenter la clé pour forcer le rechargement des commentaires
+    commentKey.value++
   } catch (error) {
     console.error('Erreur:', error)
   } finally {
     loading.value = false
   }
 }
+
+// Recharger le post quand l'ID dans la route change
+watch(() => route.params.id, (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    fetchPost()
+  }
+})
+
+// Recharger aussi quand on revient sur cette page (même ID)
+watch(() => route.fullPath, () => {
+  if (route.name === 'post-detail') {
+    fetchPost()
+  }
+}, { immediate: false })
 
 const editPost = () => {
   router.push(`/posts/${post.value.id}/edit`)
