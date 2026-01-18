@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\CommentController;
 
 // Routes PUBLIQUES (pas besoin d'être connecté)
 Route::post('/register', [AuthController::class, 'register']);
@@ -34,4 +35,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // NOUVEAU : Likes
      Route::post('/posts/{id}/like', [LikeController::class, 'toggle']);
      Route::get('/posts/{id}/likes', [LikeController::class, 'getLikes']);
+
+    // NOUVEAU : Commentaires (protégées - écriture)
+    Route::post('/posts/{id}/comments', [CommentController::class, 'store']);
+    Route::put('/comments/{id}', [CommentController::class, 'update']);
+    Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
 });

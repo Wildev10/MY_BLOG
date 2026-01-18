@@ -101,6 +101,9 @@
         </div>
       </article>
 
+      <!-- NOUVEAU : Section Commentaires -->
+      <CommentSection v-if="post" :post-id="post.id" class="mt-8" />
+
       <!-- Erreur -->
       <div v-else class="text-center py-20">
         <p class="text-gray-500 text-lg">Article introuvable</p>
@@ -120,6 +123,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getPost, deletePost, toggleLike } from '@/services/api'
+import CommentSection from '@/components/CommentSection.vue' 
 
 const router = useRouter()
 const route = useRoute()

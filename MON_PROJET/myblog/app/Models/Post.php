@@ -40,4 +40,10 @@ class Post extends Model
     {
         return $this->likes()->count();
     }
+
+    // NOUVEAU : Relation : Un post a plusieurs commentaires
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->latest();
+    }
 }
