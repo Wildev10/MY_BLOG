@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Like;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -24,6 +25,13 @@ class LikeController extends Controller
             // Déjà liké → On unlike (supprime le like)
             $existingLike->delete();
 
+          // NOUVEAU : Supprimer la notification
+            Notification::where('user_id', $post->user_id)
+                ->where('from_user_id', $userId)
+                ->where('type', 'like')
+                ->where('post_id', $postId)
+                ->delete();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Like retiré',
@@ -36,6 +44,17 @@ class LikeController extends Controller
                 'user_id' => $userId,
                 'post_id' => $postId
             ]);
+
+             // NOUVEAU : Créer une notification (sauf si c'est son propre article)
+            if ($post->user_id !== $userId) {
+                Notification::create([
+                    'user_id' => $post->user_id, // L'auteur de l'article
+                    'from_user_id' => $userId, // Celui qui like
+                    'type' => 'like',
+                    'post_id' => $postId
+                ]);
+            }
+
 
             return response()->json([
                 'success' => true,

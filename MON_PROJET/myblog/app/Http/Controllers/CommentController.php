@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Comment;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -41,6 +42,18 @@ class CommentController extends Controller
 
         // Charger la relation user pour la réponse
         $comment->load('user:id,name');
+
+
+        // NOUVEAU : Créer une notification (sauf si c'est son propre article)
+        if ($post->user_id !== $request->user()->id) {
+            Notification::create([
+                'user_id' => $post->user_id, // L'auteur de l'article
+                'from_user_id' => $request->user()->id, // Celui qui commente
+                'type' => 'comment',
+                'post_id' => $postId,
+                'comment_id' => $comment->id
+            ]);
+        }
 
         return response()->json([
             'success' => true,

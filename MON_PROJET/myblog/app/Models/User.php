@@ -132,6 +132,18 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    // Relation : Un utilisateur a plusieurs notifications
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class)->latest();
+    }
+
+    // Notifications non lues
+    public function unreadNotifications()
+    {
+        return $this->notifications()->where('is_read', false);
+    }
+
     // ==================== MÉTHODES UTILITAIRES ====================
 
     /**

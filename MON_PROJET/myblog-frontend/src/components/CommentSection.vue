@@ -141,7 +141,7 @@ import { getComments, createComment, updateComment, deleteComment } from '@/serv
 
 const props = defineProps({
   postId: {
-    type: Number,
+    type: [Number, String],
     required: true
   }
 })
@@ -183,8 +183,9 @@ const handleSubmit = async () => {
     comments.value.unshift(response.data.data)
     newComment.value = ''
   } catch (error) {
-    console.error('Erreur:', error)
-    alert('Erreur lors de l\'ajout du commentaire')
+    console.error('Erreur lors de l\'ajout du commentaire:', error)
+    const errorMessage = error.response?.data?.message || error.message || 'Erreur lors de l\'ajout du commentaire'
+    alert(errorMessage)
   } finally {
     submitting.value = false
   }

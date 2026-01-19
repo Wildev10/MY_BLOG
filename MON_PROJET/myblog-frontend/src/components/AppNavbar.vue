@@ -34,6 +34,10 @@
             >
               Mes articles
             </router-link>
+
+             <!-- AJOUTEZ ICI LE COMPOSANT NOTIFICATIONS -->
+            <NotificationDropdown />
+            
             
              <!-- NOUVEAU : Bouton Dark Mode -->
             <button
@@ -157,6 +161,12 @@
             >
               Mes articles
             </router-link>
+
+             <!-- AJOUTEZ CETTE LIGNE pour mobile -->
+            <div class="py-2">
+              <NotificationDropdown />
+            </div>
+
             <router-link
               to="/profile"
               @click="mobileMenuOpen = false"
@@ -206,6 +216,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
+import NotificationDropdown from '@/components/NotificationDropdown.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

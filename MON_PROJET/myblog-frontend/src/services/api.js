@@ -216,4 +216,26 @@ export const getUserPosts = (username, page = 1) => {
   return api.get(`/users/${username}/posts?page=${page}`)
 }
 
+// ========== NOTIFICATIONS ==========
+
+export const getNotifications = (page = 1) => {
+  return api.get(`/notifications?page=${page}`)
+}
+
+export const getUnreadCount = () => {
+  return api.get('/notifications/unread-count')
+}
+
+export const markAsRead = (notificationId) => {
+  return api.post(`/notifications/${notificationId}/mark-as-read`)
+}
+
+export const markAllAsRead = () => {
+  return api.post('/notifications/mark-all-as-read')
+}
+
+export const deleteNotification = (notificationId) => {
+  return api.delete(`/notifications/${notificationId}`)
+}
+
 export default api
