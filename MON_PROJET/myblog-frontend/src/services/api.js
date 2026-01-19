@@ -130,4 +130,90 @@ export const deleteComment = (commentId) => {
   return api.delete(`/comments/${commentId}`)
 }
 
+// ========== PROFIL UTILISATEUR ==========
+
+/**
+ * Récupérer le profil de l'utilisateur connecté
+ */
+export const getProfile = () => {
+  return api.get('/profile')
+}
+
+/**
+ * Mettre à jour le profil (avec support FormData pour avatar)
+ */
+export const updateProfile = (formData) => {
+  // Si c'est un objet simple, on le convertit
+  if (!(formData instanceof FormData)) {
+    const data = formData
+    formData = new FormData()
+    Object.keys(data).forEach(key => {
+      if (data[key] !== null && data[key] !== undefined) {
+        formData.append(key, data[key])
+      }
+    })
+  }
+  
+  formData.append('_method', 'PUT')
+  return api.post('/profile', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+/**
+ * Changer le mot de passe
+ */
+export const updatePassword = (data) => {
+  return api.put('/profile/password', {
+    current_password: data.current_password,
+    password: data.password,
+    password_confirmation: data.password_confirmation
+  })
+}
+
+/**
+ * Supprimer le compte
+ */
+export const deleteAccount = (password) => {
+  return api.delete('/profile', {
+    data: { password }
+  })
+}
+
+/**
+ * Upload d'avatar uniquement
+ */
+export const uploadAvatar = (file) => {
+  const formData = new FormData()
+  formData.append('avatar', file)
+  return api.post('/profile/avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+/**
+ * Supprimer l'avatar
+ */
+export const deleteAvatar = () => {
+  return api.delete('/profile/avatar')
+}
+
+/**
+ * Récupérer le profil public d'un utilisateur
+ */
+export const getPublicProfile = (username) => {
+  return api.get(`/users/${username}`)
+}
+
+/**
+ * Récupérer les posts d'un utilisateur
+ */
+export const getUserPosts = (username, page = 1) => {
+  return api.get(`/users/${username}/posts?page=${page}`)
+}
+
 export default api

@@ -44,16 +44,32 @@
               Image
             </label>
 
-            <!-- Image actuelle -->
-            <div v-if="post.image_url && !imagePreview" class="mb-4">
+            <!-- Image actuelle (non supprimée et pas de nouvelle preview) -->
+            <div v-if="post.image_url && !removeImage && !imagePreview" class="mb-4">
               <img :src="post.image_url" alt="Image actuelle" class="w-full h-64 object-cover rounded-lg" />
-              <button
-                type="button"
-                @click="removeCurrentImage"
-                class="mt-2 text-sm text-red-600 dark:text-red-400 hover:underline"
-              >
-                Supprimer cette image
-              </button>
+              <div class="mt-2 flex gap-4">
+                <button
+                  type="button"
+                  @click="$refs.fileInput.click()"
+                  class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  Changer l'image
+                </button>
+                <button
+                  type="button"
+                  @click="removeCurrentImage"
+                  class="text-sm text-red-600 dark:text-red-400 hover:underline"
+                >
+                  Supprimer l'image
+                </button>
+              </div>
+              <input
+                type="file"
+                ref="fileInput"
+                @change="handleFileChange"
+                accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
+                class="hidden"
+              />
             </div>
 
             <!-- Nouvelle image (preview) -->
@@ -68,28 +84,36 @@
               </button>
             </div>
 
-            <!-- Upload nouvelle image -->
+            <!-- Zone d'upload (quand pas d'image ou image supprimée) -->
             <div v-else class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-orange-500 dark:hover:border-orange-400 transition">
               <input
                 type="file"
-                ref="fileInput"
+                ref="fileInputNew"
                 @change="handleFileChange"
                 accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
                 class="hidden"
               />
               <button
                 type="button"
-                @click="$refs.fileInput.click()"
+                @click="$refs.fileInputNew.click()"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
-                {{ post.image_url ? 'Changer l\'image' : 'Ajouter une image' }}
+                Ajouter une image
               </button>
               <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
                 JPG, PNG, GIF, WEBP (max. 2MB)
               </p>
+              <button
+                v-if="removeImage && originalImageUrl"
+                type="button"
+                @click="cancelNewImage"
+                class="mt-3 text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+              >
+                Restaurer l'image originale
+              </button>
             </div>
           </div>
 

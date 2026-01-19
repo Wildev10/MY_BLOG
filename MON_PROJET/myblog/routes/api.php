@@ -7,37 +7,60 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ProfileController;
 
-// Routes PUBLIQUES (pas besoin d'être connecté)
+// ==================== ROUTES PUBLIQUES ====================
+
+// Authentification
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/posts', [PostController::class, 'index']); // Liste des articles accessible à tous
-Route::get('/posts/search', [PostController::class, 'search']);
-Route::get('/posts/{id}', [PostController::class, 'show']); // Voir un article accessible à tous
-Route::get('/posts/{id}/comments', [CommentController::class, 'index']); // Liste des commentaires (publique)
-Route::get('/categories', [CategoryController::class, 'index']); // Liste des catégories
-Route::get('/categories/{slug}/posts', [CategoryController::class, 'posts']); // Articles d'une catégorie
 
-// Routes PROTÉGÉES (besoin d'un token)
+// Posts
+Route::get('/posts', [PostController::class, 'index']);
+Route::get('/posts/search', [PostController::class, 'search']);
+Route::get('/posts/{id}', [PostController::class, 'show']);
+Route::get('/posts/{id}/comments', [CommentController::class, 'index']);
+
+// Catégories
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/categories/{slug}/posts', [CategoryController::class, 'posts']);
+
+// Profil public
+Route::get('/users/{username}', [ProfileController::class, 'publicProfile']);
+Route::get('/users/{username}/posts', [ProfileController::class, 'userPosts']);
+
+// ==================== ROUTES PROTÉGÉES ====================
+
 Route::middleware('auth:sanctum')->group(function () {
-    // Auth
+
+    // === Authentification ===
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
 
-    // Posts (actions nécessitant une connexion)
-    Route::post('/posts', [PostController::class, 'store']); // Créer un article
-    Route::put('/posts/{id}', [PostController::class, 'update']); // Modifier
-    Route::delete('/posts/{id}', [PostController::class, 'destroy']); // Supprimer
-    Route::get('/my-posts', [PostController::class, 'myPosts']); // Mes articles
+    // === Profil utilisateur ===
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);           // Voir mon profil
+        Route::put('/', [ProfileController::class, 'update']);         // Modifier mon profil
+        Route::put('/password', [ProfileController::class, 'updatePassword']); // Changer mot de passe
+        Route::delete('/', [ProfileController::class, 'destroy']);     // Supprimer mon compte
+        Route::post('/avatar', [ProfileController::class, 'uploadAvatar']);    // Upload avatar
+        Route::delete('/avatar', [ProfileController::class, 'deleteAvatar']);  // Supprimer avatar
+    });
 
-    // Categories (admin uniquement)
-    Route::post('/categories', [CategoryController::class, 'store']); // Créer une catégorie
+    // === Posts ===
+    Route::post('/posts', [PostController::class, 'store']);
+    Route::put('/posts/{id}', [PostController::class, 'update']);
+    Route::delete('/posts/{id}', [PostController::class, 'destroy']);
+    Route::get('/my-posts', [PostController::class, 'myPosts']);
 
-    // NOUVEAU : Likes
-     Route::post('/posts/{id}/like', [LikeController::class, 'toggle']);
-     Route::get('/posts/{id}/likes', [LikeController::class, 'getLikes']);
+    // === Catégories (admin) ===
+    Route::post('/categories', [CategoryController::class, 'store']);
 
-    // NOUVEAU : Commentaires (protégées - écriture)
+    // === Likes ===
+    Route::post('/posts/{id}/like', [LikeController::class, 'toggle']);
+    Route::get('/posts/{id}/likes', [LikeController::class, 'getLikes']);
+
+    // === Commentaires ===
     Route::post('/posts/{id}/comments', [CommentController::class, 'store']);
     Route::put('/comments/{id}', [CommentController::class, 'update']);
     Route::delete('/comments/{id}', [CommentController::class, 'destroy']);

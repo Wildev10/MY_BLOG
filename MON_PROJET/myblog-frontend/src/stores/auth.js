@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { login as apiLogin, logout as apiLogout, register as apiRegister, getCurrentUser } from '@/services/api'
+import { login as apiLogin, logout as apiLogout, register as apiRegister, getCurrentUser, getProfile } from '@/services/api'
 
 export const useAuthStore = defineStore('auth', () => {
   // État (données)
@@ -87,6 +87,18 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // Rafraichir le profil utilisateur avec les donnees completes
+  const refreshProfile = async () => {
+    if (!token.value) return
+    
+    try {
+      const response = await getProfile()
+      user.value = response.data.user
+    } catch (error) {
+      console.error('Erreur lors de la mise a jour du profil', error)
+    }
+  }
+
   // Initialiser le store (charger l'utilisateur si token existe)
   if (token.value) {
     fetchUser()
@@ -99,6 +111,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
-    fetchUser
+    fetchUser,
+    refreshProfile
   }
 })

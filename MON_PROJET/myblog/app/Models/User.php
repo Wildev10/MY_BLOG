@@ -2,32 +2,40 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * Modèle User avec support de profil complet
+ *
+ * Fonctionnalités:
+ * - Profil avec avatar, bio, location
+ * - Username unique pour URL publique
+ * - Soft delete pour suppression de compte
+ * - Statistiques (posts, commentaires)
+ */
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable , HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, SoftDeletes;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * Attributs assignables en masse
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
+        'avatar',
+        'bio',
+        'location',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * Attributs cachés lors de la sérialisation
      */
     protected $hidden = [
         'password',
@@ -35,33 +43,119 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Attributs ajoutés automatiquement à la sérialisation
+     */
+    protected $appends = [
+        'avatar_url',
+        'posts_count',
+        'comments_count',
+        'last_post_date',
+    ];
+
+    /**
+     * Cast des attributs
      */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'deleted_at' => 'datetime',
         ];
     }
 
-    // Relation : Un utilisateur peut avoir plusieurs posts
+    // ==================== ACCESSORS ====================
+
+    /**
+     * URL complète de l'avatar
+     * Retourne un placeholder si aucun avatar
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->avatar) {
+            return asset('storage/' . $this->avatar);
+        }
+
+        // Placeholder avec initiales via UI Avatars
+        $name = urlencode($this->name);
+        return "https://ui-avatars.com/api/?name={$name}&size=200&background=6366f1&color=ffffff&bold=true";
+    }
+
+    /**
+     * Nombre de posts publiés
+     */
+    public function getPostsCountAttribute(): int
+    {
+        return $this->posts()->count();
+    }
+
+    /**
+     * Nombre de commentaires
+     */
+    public function getCommentsCountAttribute(): int
+    {
+        return $this->comments()->count();
+    }
+
+    /**
+     * Date du dernier post
+     */
+    public function getLastPostDateAttribute(): ?string
+    {
+        $lastPost = $this->posts()->latest()->first();
+        return $lastPost?->created_at?->toISOString();
+    }
+
+    // ==================== RELATIONS ====================
+
+    /**
+     * Un utilisateur a plusieurs posts
+     */
     public function posts()
     {
         return $this->hasMany(Post::class);
     }
 
-    // NOUVEAU : Relation : Un utilisateur peut avoir plusieurs likes
-        public function likes()
+    /**
+     * Un utilisateur a plusieurs likes
+     */
+    public function likes()
     {
         return $this->hasMany(Like::class);
     }
 
-    // NOUVEAU : Relation : Un utilisateur a plusieurs commentaires
+    /**
+     * Un utilisateur a plusieurs commentaires
+     */
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    // ==================== MÉTHODES UTILITAIRES ====================
+
+    /**
+     * Générer un username unique à partir du nom
+     */
+    public static function generateUsername(string $name): string
+    {
+        $baseUsername = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $name));
+        $username = $baseUsername;
+        $counter = 1;
+
+        while (self::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
+        return $username;
+    }
+
+    /**
+     * Trouver par username ou échouer
+     */
+    public static function findByUsernameOrFail(string $username): self
+    {
+        return self::where('username', $username)->firstOrFail();
     }
 }
