@@ -92,6 +92,14 @@
           ></div>
         </div>
 
+           <!-- NOUVEAU : Boutons de partage -->
+        <div class="px-8 pb-8 border-b border-gray-200 dark:border-gray-700">
+          <ShareButtons 
+            :title="post.title"
+            :url="shareUrl"
+          />
+        </div>
+
         <!-- Actions (si c'est l'auteur) -->
         <div v-if="isAuthor" class="px-8 py-6 bg-gray-50 border-t border-gray-200">
           <div class="flex gap-4">
@@ -134,6 +142,7 @@ import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getPost, deletePost, toggleLike } from '@/services/api'
 import CommentSection from '@/components/CommentSection.vue' 
+import ShareButtons from '@/components/ShareButtons.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -219,4 +228,12 @@ const handleLike = async () => {
     console.error('Erreur:', error)
   }
 }
+
+// NOUVEAU : URL de partage
+const shareUrl = computed(() => {
+  if (typeof window !== 'undefined') {
+    return window.location.origin + '/posts/' + route.params.id
+  }
+  return ''
+})
 </script>

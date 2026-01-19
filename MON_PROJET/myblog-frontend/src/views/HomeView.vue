@@ -147,6 +147,17 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">
                   {{ formatDate(post.created_at) }}
                 </span>
+                
+                <!-- NOUVEAU : Bouton partage rapide -->
+                <button
+                  @click.stop="quickShare(post)"
+                  class="text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
+                  title="Partager"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
@@ -307,6 +318,34 @@ const formatDate = (dateString) => {
     month: 'long',
     day: 'numeric'
   })
+}
+
+// Partage rapide (utilise l'API Web Share si disponible, sinon copie le lien)
+const quickShare = async (post) => {
+  const shareData = {
+    title: post.title,
+    text: 'Découvrez cet article sur MyBlog',
+    url: window.location.origin + '/posts/' + post.id
+  }
+  
+  // Vérifier si l'API Web Share est disponible (mobile)
+  if (navigator.share) {
+    try {
+      await navigator.share(shareData)
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        console.error('Erreur de partage:', error)
+      }
+    }
+  } else {
+    // Fallback : copier le lien
+    try {
+      await navigator.clipboard.writeText(shareData.url)
+      alert('Lien copié dans le presse-papiers !')
+    } catch (error) {
+      console.error('Erreur:', error)
+    }
+  }
 }
 
 onMounted(async () => {
