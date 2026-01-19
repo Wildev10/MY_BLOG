@@ -108,9 +108,10 @@
             <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
               {{ post.title }}
             </h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
-              {{ post.content }}
-            </p>
+            <div 
+              class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 prose dark:prose-invert prose-sm"
+              v-html="post.content"
+            ></div>
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div class="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">

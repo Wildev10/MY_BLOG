@@ -138,18 +138,15 @@
             </select>
           </div>
 
-          <!-- Contenu -->
+         <!-- Contenu -->
           <div>
-            <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Contenu *
             </label>
-            <textarea
-              id="content"
-              v-model="content"
-              rows="12"
-              required
-              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            ></textarea>
+            <TiptapEditor 
+              v-model="content" 
+              placeholder="Modifiez le contenu de votre article..."
+            />
           </div>
 
           <!-- Boutons -->
@@ -179,6 +176,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getPost, updatePost, getCategories } from '@/services/api'
+import TiptapEditor from '@/components/TiptapEditor.vue'
 
 const router = useRouter()
 const route = useRoute()

@@ -104,20 +104,18 @@
             </select>
           </div>
 
-          <!-- Contenu -->
+         <!-- Contenu -->
           <div>
-            <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Contenu *
             </label>
-            <textarea
-              id="content"
-              v-model="content"
-              rows="12"
-              required
-              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="Écrivez votre article ici..."
-            ></textarea>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ content.length }} caractères</p>
+            <TiptapEditor 
+              v-model="content" 
+              placeholder="Écrivez votre article ici... Utilisez la barre d'outils pour formater le texte."
+            />
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Utilisez l'éditeur pour formatter votre texte
+            </p>
           </div>
 
           <!-- Boutons -->
@@ -147,6 +145,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { createPost, getCategories } from '@/services/api'
+import TiptapEditor from '@/components/TiptapEditor.vue'
 
 const router = useRouter()
 

@@ -84,12 +84,12 @@
             class="w-full max-h-96 object-cover"
           />
         </div>
-
-        <!-- Contenu -->
+       <!-- Contenu -->
         <div class="px-8 py-12">
-          <div class="prose prose-lg max-w-none">
-            <p class="text-gray-700 whitespace-pre-wrap leading-relaxed">{{ post.content }}</p>
-          </div>
+          <div 
+            class="prose prose-lg dark:prose-invert max-w-none text-gray-900 dark:text-white"
+            v-html="post.content"
+          ></div>
         </div>
 
         <!-- Actions (si c'est l'auteur) -->
