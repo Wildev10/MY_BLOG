@@ -1,32 +1,32 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-green-50 to-teal-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+  <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 transition-colors">
     <div class="max-w-3xl mx-auto">
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-transparent dark:border-gray-700">
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 sm:p-8">
         <!-- Header -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-            Créer un nouvel article
+          <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
+            Nouvel article
           </h1>
-          <p class="mt-2 text-gray-600 dark:text-gray-400">
-            Partagez vos idées avec la communauté
+          <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            Partagez vos idees avec la communaute
           </p>
         </div>
 
         <!-- Messages -->
-        <div v-if="errorMessage" class="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded">
-          <p class="text-sm text-red-700 dark:text-red-400">{{ errorMessage }}</p>
+        <div v-if="errorMessage" class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+          <p class="text-sm text-red-600 dark:text-red-400">{{ errorMessage }}</p>
         </div>
 
-        <div v-if="successMessage" class="mb-6 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 rounded">
-          <p class="text-sm text-green-700 dark:text-green-400">{{ successMessage }}</p>
+        <div v-if="successMessage" class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
+          <p class="text-sm text-green-600 dark:text-green-400">{{ successMessage }}</p>
         </div>
 
         <!-- Formulaire -->
         <form @submit.prevent="handleSubmit" class="space-y-6">
           <!-- Titre -->
           <div>
-            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Titre de l'article *
+            <label for="title" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
+              Titre *
             </label>
             <input
               id="title"
@@ -34,32 +34,34 @@
               type="text"
               required
               maxlength="255"
-              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-transparent transition text-sm"
               placeholder="Un titre accrocheur..."
             />
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ title.length }}/255 caractères</p>
+            <p class="mt-1 text-xs text-zinc-400">{{ title.length }}/255 caracteres</p>
           </div>
 
-          <!-- NOUVEAU : Image -->
+          <!-- Image -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
               Image (optionnelle)
             </label>
             
-            <!-- Preview de l'image -->
-            <div v-if="imagePreview" class="mb-4">
-              <img :src="imagePreview" alt="Preview" class="w-full h-64 object-cover rounded-lg" />
+            <!-- Preview -->
+            <div v-if="imagePreview" class="relative">
+              <img :src="imagePreview" alt="Preview" class="w-full h-48 object-cover rounded-md" />
               <button
                 type="button"
-                @click="removeImage"
-                class="mt-2 text-sm text-red-600 dark:text-red-400 hover:underline"
+                @click="removeImageHandler"
+                class="absolute top-2 right-2 p-1.5 bg-white dark:bg-zinc-800 rounded-md border border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:text-red-500 transition"
               >
-                Supprimer l'image
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
               </button>
             </div>
 
-            <!-- Input file -->
-            <div v-else class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-green-500 dark:hover:border-green-400 transition">
+            <!-- Upload zone -->
+            <div v-else class="border border-dashed border-zinc-300 dark:border-zinc-700 rounded-md p-6 text-center hover:border-zinc-400 dark:hover:border-zinc-600 transition">
               <input
                 type="file"
                 ref="fileInput"
@@ -70,30 +72,28 @@
               <button
                 type="button"
                 @click="$refs.fileInput.click()"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-700 transition"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
                 Choisir une image
               </button>
-              <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                JPG, PNG, GIF, WEBP (max. 2MB)
-              </p>
+              <p class="mt-2 text-xs text-zinc-400">JPG, PNG, GIF, WEBP (max. 2MB)</p>
             </div>
           </div>
 
-          <!-- Catégorie -->
+          <!-- Categorie -->
           <div>
-            <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Catégorie
+            <label for="category" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
+              Categorie
             </label>
             <select
               id="category"
               v-model="categoryId"
-              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              class="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-transparent transition text-sm"
             >
-              <option :value="null">Aucune catégorie</option>
+              <option :value="null">Aucune categorie</option>
               <option
                 v-for="category in categories"
                 :key="category.id"
@@ -104,33 +104,30 @@
             </select>
           </div>
 
-         <!-- Contenu -->
+          <!-- Contenu -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
               Contenu *
             </label>
             <TiptapEditor 
               v-model="content" 
-              placeholder="Écrivez votre article ici... Utilisez la barre d'outils pour formater le texte."
+              placeholder="Ecrivez votre article ici..."
             />
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Utilisez l'éditeur pour formatter votre texte
-            </p>
           </div>
 
           <!-- Boutons -->
-          <div class="flex gap-4">
+          <div class="flex gap-3 pt-4">
             <button
               type="submit"
               :disabled="loading"
-              class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              class="flex-1 px-4 py-2.5 text-sm font-medium rounded-md text-white dark:text-zinc-900 bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
               {{ loading ? 'Publication...' : 'Publier' }}
             </button>
             <button
               type="button"
               @click="$router.push('/')"
-              class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+              class="px-4 py-2.5 text-sm font-medium rounded-md text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition"
             >
               Annuler
             </button>
@@ -153,8 +150,8 @@ const title = ref('')
 const content = ref('')
 const categoryId = ref(null)
 const categories = ref([])
-const imageFile = ref(null) // NOUVEAU
-const imagePreview = ref(null) // NOUVEAU
+const imageFile = ref(null)
+const imagePreview = ref(null)
 const errorMessage = ref('')
 const successMessage = ref('')
 const loading = ref(false)
@@ -164,23 +161,20 @@ const fetchCategories = async () => {
     const response = await getCategories()
     categories.value = response.data.data
   } catch (error) {
-    console.error('Erreur lors du chargement des catégories:', error)
+    console.error('Erreur:', error)
   }
 }
 
-// NOUVEAU : Gérer le changement de fichier
 const handleFileChange = (event) => {
   const file = event.target.files[0]
   if (file) {
-    // Vérifier la taille (max 2MB)
     if (file.size > 2048 * 1024) {
-      errorMessage.value = 'L\'image ne doit pas dépasser 2MB'
+      errorMessage.value = "L'image ne doit pas depasser 2MB"
       return
     }
     
     imageFile.value = file
     
-    // Créer une preview
     const reader = new FileReader()
     reader.onload = (e) => {
       imagePreview.value = e.target.result
@@ -189,8 +183,7 @@ const handleFileChange = (event) => {
   }
 }
 
-// NOUVEAU : Supprimer l'image
-const removeImage = () => {
+const removeImageHandler = () => {
   imageFile.value = null
   imagePreview.value = null
 }
@@ -201,7 +194,6 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    // NOUVEAU : Créer un FormData
     const formData = new FormData()
     formData.append('title', title.value)
     formData.append('content', content.value)
@@ -215,13 +207,13 @@ const handleSubmit = async () => {
     }
 
     await createPost(formData)
-    successMessage.value = 'Article publié avec succès !'
+    successMessage.value = 'Article publie avec succes !'
     
     setTimeout(() => {
       router.push('/')
     }, 1500)
   } catch (error) {
-    errorMessage.value = error.response?.data?.message || 'Erreur lors de la création de l\'article'
+    errorMessage.value = error.response?.data?.message || "Erreur lors de la creation"
   } finally {
     loading.value = false
   }

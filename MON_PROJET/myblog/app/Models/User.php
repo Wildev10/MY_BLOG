@@ -29,6 +29,8 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'role',
+        'is_banned',
         'avatar',
         'bio',
         'location',
@@ -40,6 +42,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'is_banned' => 'boolean',
     ];
 
     /**
@@ -52,6 +55,7 @@ class User extends Authenticatable
         'last_post_date',
     ];
 
+
     /**
      * Cast des attributs
      */
@@ -63,6 +67,13 @@ class User extends Authenticatable
             'deleted_at' => 'datetime',
         ];
     }
+
+     // NOUVEAU : Vérifier si l'utilisateur est admin
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
 
     // ==================== ACCESSORS ====================
 

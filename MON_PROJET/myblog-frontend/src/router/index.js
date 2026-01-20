@@ -48,25 +48,68 @@ const router = createRouter({
       component: () => import('@/views/ProfileView.vue'),
       meta: { requiresAuth: true }
     },
+    // NOUVEAU : Routes Admin
     {
-      path: '/profile/edit',
-      name: 'profile-edit',
-      component: () => import('@/views/EditProfileView.vue'),
-      meta: { requiresAuth: true }
+      path: '/admin',
+      name: 'admin-dashboard',
+      component: () => import('@/views/admin/AdminDashboardView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
-      path: '/users/:username',
-      name: 'public-profile',
-      component: () => import('@/views/PublicProfileView.vue')
+      path: '/admin/users',
+      name: 'admin-users',
+      component: () => import('@/views/admin/AdminUsersView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/posts',
+      name: 'admin-posts',
+      component: () => import('@/views/admin/AdminPostsView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/comments',
+      name: 'admin-comments',
+      component: () => import('@/views/admin/AdminCommentsView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/categories',
+      name: 'admin-categories',
+      component: () => import('@/views/admin/AdminCategoriesView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     }
   ]
 })
 
+// Navigation guard
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   
+  // Vérifier l'authentification
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/login')
+    return
+  }
+  
+  // NOUVEAU : Vérifier le rôle admin
+  if (to.meta.requiresAdmin) {
+    if (!authStore.user) {
+      // Si pas de user chargé, essayer de le charger
+      authStore.fetchUser().then(() => {
+        if (authStore.user?.role !== 'admin') {
+          alert('Accès refusé. Cette page est réservée aux administrateurs.')
+          next('/')
+        } else {
+          next()
+        }
+      })
+    } else if (authStore.user.role !== 'admin') {
+      alert('Accès refusé. Cette page est réservée aux administrateurs.')
+      next('/')
+    } else {
+      next()
+    }
   } else {
     next()
   }

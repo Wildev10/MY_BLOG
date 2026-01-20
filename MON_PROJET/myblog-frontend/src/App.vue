@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col font-sans bg-gray-50">
+  <div class="min-h-screen flex flex-col font-sans bg-zinc-50 dark:bg-zinc-950">
     <AppNavbar v-if="!hideNavbar" />
 
     <!-- Main Content -->
@@ -32,12 +32,11 @@ const hideNavbar = computed(() => {
 <style>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.15s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: translateY(10px);
 }
 </style>

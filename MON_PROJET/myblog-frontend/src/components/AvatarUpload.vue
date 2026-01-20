@@ -6,17 +6,17 @@
         :src="avatarUrl"
         :alt="name"
         :class="sizeClasses"
-        class="rounded-full object-cover border-4 border-white shadow-lg"
+        class="rounded-full object-cover border-2 border-zinc-200 dark:border-zinc-700"
       />
       
       <!-- Overlay pour changer l'avatar -->
       <div
         v-if="editable"
         @click="triggerFileInput"
-        class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+        class="absolute inset-0 flex items-center justify-center bg-zinc-900/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
       >
         <div class="text-center text-white">
-          <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
           </svg>
@@ -27,9 +27,9 @@
       <!-- Loader -->
       <div
         v-if="uploading"
-        class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full"
+        class="absolute inset-0 flex items-center justify-center bg-zinc-900/60 rounded-full"
       >
-        <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <svg class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
@@ -50,16 +50,16 @@
       v-if="editable && hasCustomAvatar"
       @click="handleDelete"
       type="button"
-      class="absolute -bottom-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-lg transition"
+      class="absolute -bottom-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition"
       title="Supprimer l'avatar"
     >
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
       </svg>
     </button>
 
     <!-- Message d'erreur -->
-    <p v-if="error" class="mt-2 text-sm text-red-600 text-center">{{ error }}</p>
+    <p v-if="error" class="mt-2 text-xs text-red-600 dark:text-red-400 text-center">{{ error }}</p>
   </div>
 </template>
 
@@ -77,7 +77,7 @@ const props = defineProps({
   },
   size: {
     type: String,
-    default: 'lg', // sm, md, lg, xl
+    default: 'lg',
     validator: (value) => ['sm', 'md', 'lg', 'xl'].includes(value)
   },
   editable: {
@@ -96,41 +96,36 @@ const fileInput = ref(null)
 const uploading = ref(false)
 const error = ref('')
 
-// Classes de taille
 const sizeClasses = computed(() => {
   const sizes = {
-    sm: 'w-12 h-12',
-    md: 'w-20 h-20',
-    lg: 'w-32 h-32',
-    xl: 'w-40 h-40'
+    sm: 'w-10 h-10',
+    md: 'w-16 h-16',
+    lg: 'w-24 h-24',
+    xl: 'w-32 h-32'
   }
   return sizes[props.size]
 })
 
-// Ouvrir le sélecteur de fichier
 const triggerFileInput = () => {
   if (!uploading.value) {
     fileInput.value?.click()
   }
 }
 
-// Gérer le changement de fichier
 const handleFileChange = async (event) => {
   const file = event.target.files[0]
   if (!file) return
 
   error.value = ''
 
-  // Valider le type
   const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp']
   if (!validTypes.includes(file.type)) {
     error.value = 'Format non supporté. Utilisez JPG, PNG, GIF ou WebP.'
     return
   }
 
-  // Valider la taille (2MB max)
   if (file.size > 2 * 1024 * 1024) {
-    error.value = 'L\'image ne doit pas dépasser 2 Mo.'
+    error.value = "L'image ne doit pas dépasser 2 Mo."
     return
   }
 
@@ -139,19 +134,16 @@ const handleFileChange = async (event) => {
     emit('upload', file)
   } finally {
     uploading.value = false
-    // Reset l'input
     event.target.value = ''
   }
 }
 
-// Gérer la suppression
 const handleDelete = () => {
   if (confirm('Supprimer votre avatar ?')) {
     emit('delete')
   }
 }
 
-// Exposer pour le parent
 defineExpose({
   setUploading: (value) => { uploading.value = value },
   setError: (message) => { error.value = message }

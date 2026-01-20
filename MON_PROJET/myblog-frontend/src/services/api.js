@@ -238,4 +238,50 @@ export const deleteNotification = (notificationId) => {
   return api.delete(`/notifications/${notificationId}`)
 }
 
+// ========== ADMIN ==========
+
+export const getAdminStats = () => {
+  return api.get('/admin/stats')
+}
+
+export const getAdminUsers = (params = {}) => {
+  return api.get('/admin/users', { params })
+}
+
+export const toggleUserAdmin = (userId) => {
+  return api.put(`/admin/users/${userId}/toggle-admin`)
+}
+
+export const toggleUserBan = (userId) => {
+  return api.put(`/admin/users/${userId}/toggle-ban`)
+}
+
+export const getAdminPosts = (params = {}) => {
+  return api.get('/admin/posts', { params })
+}
+
+export const deleteAdminPost = (postId) => {
+  return api.delete(`/admin/posts/${postId}`)
+}
+
+export const getAdminComments = (params = {}) => {
+  return api.get('/admin/comments', { params })
+}
+
+export const deleteAdminComment = (commentId) => {
+  return api.delete(`/admin/comments/${commentId}`)
+}
+
+export const getAdminCategoriesStats = () => {
+  return api.get('/admin/categories/stats')
+}
+
+export const updateAdminCategory = (categoryId, data) => {
+  return api.put(`/admin/categories/${categoryId}`, data)
+}
+
+export const deleteAdminCategory = (categoryId) => {
+  return api.delete(`/admin/categories/${categoryId}`)
+}
+
 export default api

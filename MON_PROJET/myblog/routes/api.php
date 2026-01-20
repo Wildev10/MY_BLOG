@@ -9,6 +9,7 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\AdminController;
 
 // ==================== ROUTES PUBLIQUES ====================
 
@@ -72,4 +73,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+
+    // ROUTES ADMIN (protégées par middleware admin)
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    // Statistiques
+    Route::get('/stats', [AdminController::class, 'stats']);
+
+    // Gestion des utilisateurs
+    Route::get('/users', [AdminController::class, 'users']);
+    Route::put('/users/{id}/toggle-admin', [AdminController::class, 'toggleAdmin']);
+    Route::put('/users/{id}/toggle-ban', [AdminController::class, 'toggleBan']);
+
+    // Gestion des articles
+    Route::get('/posts', [AdminController::class, 'posts']);
+    Route::delete('/posts/{id}', [AdminController::class, 'deletePost']);
+
+    // Gestion des commentaires
+    Route::get('/comments', [AdminController::class, 'comments']);
+    Route::delete('/comments/{id}', [AdminController::class, 'deleteComment']);
+
+    // Gestion des catégories
+    Route::get('/categories/stats', [AdminController::class, 'categoriesStats']);
+    Route::put('/categories/{id}', [AdminController::class, 'updateCategory']);
+    Route::delete('/categories/{id}', [AdminController::class, 'deleteCategory']);
+});
 });

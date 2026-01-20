@@ -1,143 +1,145 @@
 <template>
-  <div class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-screen">
-    <div class="max-w-7xl mx-auto">
-      
+  <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 transition-colors">
+    <div class="max-w-5xl mx-auto">
       <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
         <div>
-          <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
-            Mes Articles
+          <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
+            Mes articles
           </h1>
-          <p class="mt-2 text-gray-600">Gérez vos publications et partagez vos idées avec le monde.</p>
+          <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            {{ posts.length }} article{{ posts.length > 1 ? 's' : '' }}
+          </p>
         </div>
         <router-link 
           to="/create" 
-          class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+          class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-md text-white dark:text-zinc-900 bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition"
         >
-          <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
           Nouvel article
         </router-link>
       </div>
 
-      <!-- Loading State -->
-      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div v-for="n in 6" :key="n" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-pulse">
-           <div class="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-           <div class="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-           <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
-           <div class="h-4 bg-gray-200 rounded w-5/6 mb-6"></div>
-           <div class="flex justify-between mt-auto">
-             <div class="h-8 bg-gray-200 rounded w-20"></div>
-             <div class="h-8 bg-gray-200 rounded w-20"></div>
-           </div>
-        </div>
-      </div>
-
-      <!-- Error State -->
-      <div v-else-if="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-6 rounded-r shadow-md">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm text-red-700">{{ errorMessage }}</p>
+      <!-- Loading -->
+      <div v-if="loading" class="space-y-4">
+        <div v-for="n in 3" :key="n" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 animate-pulse">
+          <div class="flex gap-4">
+            <div class="w-24 h-20 bg-zinc-200 dark:bg-zinc-800 rounded-md"></div>
+            <div class="flex-1">
+              <div class="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4 mb-2"></div>
+              <div class="h-3 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2 mb-2"></div>
+              <div class="h-3 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Empty State -->
-      <div v-else-if="posts.length === 0" class="text-center py-20 bg-white rounded-3xl shadow-sm border border-dashed border-gray-300">
-         <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-50 mb-6">
-            <svg class="h-10 w-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-         </div>
-         <h3 class="text-xl font-medium text-gray-900 mb-2">Vous n'avez pas encore d'articles</h3>
-         <p class="text-gray-500 mb-8 max-w-md mx-auto">Commencez à écrire dès aujourd'hui et partagez votre premier article avec notre communauté.</p>
-         <router-link to="/create" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-indigo-700 bg-indigo-100 hover:bg-indigo-200 transition-colors">
-            Créer mon premier article
-         </router-link>
+      <!-- Error -->
+      <div v-else-if="errorMessage" class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+        <p class="text-sm text-red-600 dark:text-red-400">{{ errorMessage }}</p>
       </div>
 
-      <!-- Posts Grid -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div 
+      <!-- Empty -->
+      <div v-else-if="posts.length === 0" class="text-center py-16 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg">
+        <svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+        <h3 class="mt-4 text-sm font-medium text-zinc-900 dark:text-zinc-50">Aucun article</h3>
+        <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Commencez par creer votre premier article.</p>
+        <router-link 
+          to="/create" 
+          class="inline-block mt-6 px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-700 transition"
+        >
+          Creer un article
+        </router-link>
+      </div>
+
+      <!-- Posts list -->
+      <div v-else class="space-y-3">
+        <article 
           v-for="post in posts" 
           :key="post.id" 
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition overflow-hidden border border-transparent dark:border-gray-700 group"
+          class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700 transition"
         >
-          <!-- Image de l'article -->
-          <div v-if="post.image_url" class="w-full h-48 overflow-hidden">
-            <img 
-              :src="post.image_url" 
-              :alt="post.title"
-              class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-            />
-          </div>
-          
-          <!-- Placeholder si pas d'image -->
-          <div v-else class="w-full h-48 bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/20 dark:to-indigo-900/20 flex items-center justify-center">
-            <svg class="w-16 h-16 text-purple-300 dark:text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-          </div>
-
-          <!-- Card Content -->
-          <div class="p-6">
-            <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-3">
-              <span class="flex items-center">
-                <svg class="w-4 h-4 mr-1.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                {{ formatDate(post.created_at) }}
-              </span>
+          <div class="flex">
+            <!-- Image -->
+            <div class="w-32 h-28 flex-shrink-0 bg-zinc-100 dark:bg-zinc-800">
+              <img 
+                v-if="post.image_url"
+                :src="post.image_url" 
+                :alt="post.title"
+                class="w-full h-full object-cover"
+              />
+              <div v-else class="w-full h-full flex items-center justify-center">
+                <svg class="w-8 h-8 text-zinc-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
             </div>
 
-            <router-link :to="{ name: 'post-detail', params: { id: post.id } }" class="block group-hover:text-indigo-600 transition-colors">
-              <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
-                {{ post.title }}
-              </h3>
-            </router-link>
-            
-            <!-- Badge Catégorie -->
-            <span 
-              v-if="post.category" 
-              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mb-3"
-              :style="{ backgroundColor: post.category.color + '20', color: post.category.color }"
-            >
-              {{ post.category.name }}
-            </span>
+            <!-- Content -->
+            <div class="flex-1 p-4 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span 
+                    v-if="post.category" 
+                    class="px-2 py-0.5 text-xs font-medium rounded"
+                    :style="{ backgroundColor: post.category.color + '15', color: post.category.color }"
+                  >
+                    {{ post.category.name }}
+                  </span>
+                  <span class="text-xs text-zinc-400">{{ formatDate(post.created_at) }}</span>
+                </div>
+                <router-link :to="{ name: 'post-detail', params: { id: post.id } }">
+                  <h3 class="text-base font-medium text-zinc-900 dark:text-zinc-50 hover:text-zinc-600 dark:hover:text-zinc-300 transition line-clamp-1">
+                    {{ post.title }}
+                  </h3>
+                </router-link>
+              </div>
 
-            <p class="text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
-              {{ post.content }}
-            </p>
-          </div>
+              <!-- Actions -->
+              <div class="flex items-center justify-between mt-2">
+                <div class="flex items-center gap-3 text-xs text-zinc-400">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                    {{ post.likes_count || 0 }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    {{ post.comments_count || 0 }}
+                  </span>
+                </div>
 
-          <!-- Actions Footer -->
-          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
-            <router-link 
-              :to="{ name: 'post-detail', params: { id: post.id } }"
-              class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-            >
-              Voir l'article
-            </router-link>
-            
-            <div class="flex items-center gap-3">
-              <router-link 
-                :to="{ name: 'post-edit', params: { id: post.id } }" 
-                class="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors"
-                title="Modifier"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-              </router-link>
-              <button 
-                @click="confirmDelete(post.id)" 
-                class="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-                title="Supprimer"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-              </button>
+                <div class="flex items-center gap-1">
+                  <router-link 
+                    :to="{ name: 'post-edit', params: { id: post.id } }" 
+                    class="p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 rounded transition"
+                    title="Modifier"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                  </router-link>
+                  <button 
+                    @click="confirmDelete(post.id)" 
+                    class="p-1.5 text-zinc-400 hover:text-red-500 rounded transition"
+                    title="Supprimer"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </article>
       </div>
     </div>
   </div>
@@ -151,7 +153,6 @@ const posts = ref([])
 const loading = ref(true)
 const errorMessage = ref('')
 
-// Fonction pour formater la date
 const formatDate = (dateString) => {
   if (!dateString) return ''
   const date = new Date(dateString)
@@ -163,36 +164,43 @@ const formatDate = (dateString) => {
 }
 
 const fetchPosts = async () => {
-    loading.value = true
-    try {
-        const response = await getMyPosts()
-        // Handle pagination response from Laravel
-        // response.data.data is the paginator object, response.data.data.data is the array of posts
-        if (response.data.data && response.data.data.data) {
-             posts.value = response.data.data.data
-        } else {
-             posts.value = response.data.data || []
-        }
-    } catch (error) {
-        errorMessage.value = "Impossible de récupérer vos articles."
-    } finally {
-        loading.value = false
+  loading.value = true
+  try {
+    const response = await getMyPosts()
+    if (response.data.data && response.data.data.data) {
+      posts.value = response.data.data.data
+    } else {
+      posts.value = response.data.data || []
     }
+  } catch (error) {
+    errorMessage.value = "Impossible de recuperer vos articles."
+  } finally {
+    loading.value = false
+  }
 }
 
 const confirmDelete = async (id) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible.")) {
-        try {
-            await deletePost(id)
-            // Remove from list immediately
-            posts.value = posts.value.filter(p => p.id !== id)
-        } catch (error) {
-            alert("Erreur lors de la suppression")
-        }
+  if (confirm("Supprimer cet article ?")) {
+    try {
+      await deletePost(id)
+      posts.value = posts.value.filter(p => p.id !== id)
+    } catch (error) {
+      alert("Erreur lors de la suppression")
     }
+  }
 }
 
 onMounted(() => {
-    fetchPosts()
+  fetchPosts()
 })
 </script>
+
+<style scoped>
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
