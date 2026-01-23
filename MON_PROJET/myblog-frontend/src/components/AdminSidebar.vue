@@ -1,37 +1,39 @@
 <template>
-  <div class="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4 sticky top-20">
-    <p class="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-3 px-3">
-      Administration
-    </p>
+  <div class="bg-white dark:bg-zinc-900 h-full rounded-xl border border-zinc-200 dark:border-zinc-800 flex flex-col shadow-sm">
+    <div class="p-6 border-b border-zinc-100 dark:border-zinc-800">
+      <span class="text-xs font-bold text-zinc-400 uppercase tracking-widest">
+        Administration
+      </span>
+    </div>
     
-    <nav class="space-y-1">
+    <nav class="flex-1 p-4 space-y-1">
       <router-link
         v-for="item in menuItems"
         :key="item.path"
         :to="item.path"
         :class="[
-          'flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors',
+          'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all',
           $route.path === item.path
-            ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 font-medium'
-            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 hover:bg-zinc-50 dark:hover:bg-zinc-800'
+            ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm'
+            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-200'
         ]"
       >
-        <component :is="item.icon" class="w-4 h-4" />
+        <component :is="item.icon" class="w-5 h-5 flex-shrink-0" :class="$route.path === item.path ? 'opacity-100' : 'opacity-70'" />
         <span>{{ item.label }}</span>
       </router-link>
     </nav>
 
-    <hr class="my-4 border-zinc-100 dark:border-zinc-800" />
-
-    <router-link
-      to="/"
-      class="flex items-center gap-2 px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors"
-    >
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-      </svg>
-      Retour au site
-    </router-link>
+    <div class="p-4 mt-auto border-t border-zinc-100 dark:border-zinc-800">
+      <router-link
+        to="/"
+        class="flex items-center justify-center gap-2 px-4 py-2 w-full text-sm font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-200 rounded-lg transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Retour au site
+      </router-link>
+    </div>
   </div>
 </template>
 

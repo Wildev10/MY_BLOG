@@ -1,21 +1,21 @@
 <template>
-  <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 py-12 px-4 transition-colors">
+  <div class="min-h-screen bg-slate-50 dark:bg-slate-950 py-12 px-4 transition-colors">
     <div class="max-w-2xl mx-auto">
       <!-- Header -->
       <div class="mb-8">
-        <router-link to="/profile" class="inline-flex items-center text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 transition">
+        <router-link to="/profile" class="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition">
           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
           Retour
         </router-link>
-        <h1 class="mt-4 text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">Modifier mon profil</h1>
+        <h1 class="mt-4 text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Modifier mon profil</h1>
       </div>
 
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- Avatar -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6">
-          <h2 class="text-sm font-medium text-zinc-900 dark:text-zinc-50 mb-4">Photo de profil</h2>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
+          <h2 class="text-sm font-semibold text-slate-900 dark:text-white mb-4">Photo de profil</h2>
           <div class="flex items-center gap-6">
             <AvatarUpload
               :avatar-url="form.avatar_url"
@@ -27,7 +27,7 @@
               @upload="handleAvatarUpload"
               @delete="handleAvatarDelete"
             />
-            <div class="text-xs text-zinc-400">
+            <div class="text-xs text-slate-400">
               <p>Formats: JPG, PNG, GIF, WEBP</p>
               <p>Max: 2 Mo</p>
             </div>
@@ -35,13 +35,13 @@
         </div>
 
         <!-- Informations -->
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6">
-          <h2 class="text-sm font-medium text-zinc-900 dark:text-zinc-50 mb-4">Informations</h2>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
+          <h2 class="text-sm font-semibold text-slate-900 dark:text-white mb-4">Informations</h2>
           
           <div class="space-y-4">
             <!-- Nom -->
             <div>
-              <label for="name" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
+              <label for="name" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
                 Nom *
               </label>
               <input
@@ -49,25 +49,25 @@
                 v-model="form.name"
                 type="text"
                 required
-                class="w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 text-sm focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-transparent transition"
-                :class="errors.name ? 'border-red-300 dark:border-red-700' : 'border-zinc-200 dark:border-zinc-700'"
+                class="w-full px-3 py-2 border rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-slate-900 dark:focus:ring-white focus:border-transparent transition"
+                :class="errors.name ? 'border-red-300 dark:border-red-700' : 'border-slate-200 dark:border-slate-700'"
               />
               <p v-if="errors.name" class="mt-1 text-xs text-red-500">{{ errors.name[0] }}</p>
             </div>
 
             <!-- Username -->
             <div>
-              <label for="username" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
+              <label for="username" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
                 Username
               </label>
               <div class="flex">
-                <span class="inline-flex items-center px-3 text-sm text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-r-0 border-zinc-200 dark:border-zinc-700 rounded-l-md">@</span>
+                <span class="inline-flex items-center px-3 text-sm text-slate-400 bg-slate-100 dark:bg-slate-800 border border-r-0 border-slate-200 dark:border-slate-700 rounded-l-lg">@</span>
                 <input
                   id="username"
                   v-model="form.username"
                   type="text"
-                  class="flex-1 px-3 py-2 border rounded-r-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 text-sm focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-transparent transition"
-                  :class="errors.username ? 'border-red-300 dark:border-red-700' : 'border-zinc-200 dark:border-zinc-700'"
+                  class="flex-1 px-3 py-2 border rounded-r-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-slate-900 dark:focus:ring-white focus:border-transparent transition"
+                  :class="errors.username ? 'border-red-300 dark:border-red-700' : 'border-slate-200 dark:border-slate-700'"
                   placeholder="mon-pseudo"
                 />
               </div>
@@ -76,7 +76,7 @@
 
             <!-- Email -->
             <div>
-              <label for="email" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
+              <label for="email" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
                 Email *
               </label>
               <input
@@ -84,37 +84,37 @@
                 v-model="form.email"
                 type="email"
                 required
-                class="w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 text-sm focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-transparent transition"
-                :class="errors.email ? 'border-red-300 dark:border-red-700' : 'border-zinc-200 dark:border-zinc-700'"
+                class="w-full px-3 py-2 border rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-slate-900 dark:focus:ring-white focus:border-transparent transition"
+                :class="errors.email ? 'border-red-300 dark:border-red-700' : 'border-slate-200 dark:border-slate-700'"
               />
               <p v-if="errors.email" class="mt-1 text-xs text-red-500">{{ errors.email[0] }}</p>
             </div>
 
             <!-- Bio -->
             <div>
-              <label for="bio" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
+              <label for="bio" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
                 Bio
               </label>
               <textarea
                 id="bio"
                 v-model="form.bio"
                 rows="3"
-                class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 text-sm focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-transparent transition resize-none"
+                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-slate-900 dark:focus:ring-white focus:border-transparent transition resize-none"
                 placeholder="Quelques mots sur vous..."
               ></textarea>
-              <p class="mt-1 text-xs text-zinc-400 text-right">{{ form.bio?.length || 0 }}/500</p>
+              <p class="mt-1 text-xs text-slate-400 text-right">{{ form.bio?.length || 0 }}/500</p>
             </div>
 
             <!-- Location -->
             <div>
-              <label for="location" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
+              <label for="location" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
                 Localisation
               </label>
               <input
                 id="location"
                 v-model="form.location"
                 type="text"
-                class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 text-sm focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-transparent transition"
+                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-slate-900 dark:focus:ring-white focus:border-transparent transition"
                 placeholder="Paris, France"
               />
             </div>
@@ -125,14 +125,14 @@
         <div class="flex justify-end gap-3">
           <router-link
             to="/profile"
-            class="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800 transition"
+            class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition"
           >
             Annuler
           </router-link>
           <button
             type="submit"
             :disabled="saving"
-            class="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-zinc-900 dark:bg-zinc-50 rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 transition"
+            class="px-4 py-2 text-sm font-bold text-white dark:text-slate-900 bg-slate-900 dark:bg-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 disabled:opacity-50 transition"
           >
             {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
           </button>
@@ -140,12 +140,12 @@
       </form>
 
       <!-- Mot de passe -->
-      <div class="mt-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6">
-        <h2 class="text-sm font-medium text-zinc-900 dark:text-zinc-50 mb-4">Changer le mot de passe</h2>
+      <div class="mt-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
+        <h2 class="text-sm font-semibold text-slate-900 dark:text-white mb-4">Changer le mot de passe</h2>
         
         <form @submit.prevent="handlePasswordChange" class="space-y-4">
           <div>
-            <label for="current_password" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
+            <label for="current_password" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
               Mot de passe actuel
             </label>
             <input
@@ -153,14 +153,14 @@
               v-model="passwordForm.current_password"
               type="password"
               required
-              class="w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 text-sm focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-transparent transition"
-              :class="passwordErrors.current_password ? 'border-red-300 dark:border-red-700' : 'border-zinc-200 dark:border-zinc-700'"
+              class="w-full px-3 py-2 border rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-slate-900 dark:focus:ring-white focus:border-transparent transition"
+              :class="passwordErrors.current_password ? 'border-red-300 dark:border-red-700' : 'border-slate-200 dark:border-slate-700'"
             />
             <p v-if="passwordErrors.current_password" class="mt-1 text-xs text-red-500">{{ passwordErrors.current_password[0] }}</p>
           </div>
 
           <div>
-            <label for="password" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
+            <label for="password" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
               Nouveau mot de passe
             </label>
             <input
@@ -168,14 +168,14 @@
               v-model="passwordForm.password"
               type="password"
               required
-              class="w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 text-sm focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-transparent transition"
-              :class="passwordErrors.password ? 'border-red-300 dark:border-red-700' : 'border-zinc-200 dark:border-zinc-700'"
+              class="w-full px-3 py-2 border rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-slate-900 dark:focus:ring-white focus:border-transparent transition"
+              :class="passwordErrors.password ? 'border-red-300 dark:border-red-700' : 'border-slate-200 dark:border-slate-700'"
             />
             <p v-if="passwordErrors.password" class="mt-1 text-xs text-red-500">{{ passwordErrors.password[0] }}</p>
           </div>
 
           <div>
-            <label for="password_confirmation" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
+            <label for="password_confirmation" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
               Confirmer
             </label>
             <input
@@ -183,7 +183,7 @@
               v-model="passwordForm.password_confirmation"
               type="password"
               required
-              class="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 text-sm focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-50 focus:border-transparent transition"
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-slate-900 dark:focus:ring-white focus:border-transparent transition"
             />
           </div>
 
@@ -191,7 +191,7 @@
             <button
               type="submit"
               :disabled="changingPassword"
-              class="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-zinc-900 dark:bg-zinc-50 rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 transition"
+              class="px-4 py-2 text-sm font-bold text-white dark:text-slate-900 bg-slate-900 dark:bg-white rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 disabled:opacity-50 transition"
             >
               {{ changingPassword ? 'Modification...' : 'Changer' }}
             </button>
@@ -203,7 +203,7 @@
       <Teleport to="body">
         <div
           v-if="showSuccessMessage"
-          class="fixed bottom-4 right-4 bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900 px-4 py-3 rounded-md text-sm font-medium z-50 flex items-center gap-2"
+          class="fixed bottom-4 right-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-3 rounded-lg text-sm font-bold z-50 flex items-center gap-2 shadow-lg"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
