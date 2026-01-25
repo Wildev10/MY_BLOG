@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -83,5 +85,51 @@ class AuthController extends Controller
             'success' => true,
             'data' => $request->user()
         ], Response::HTTP_OK);
+    }
+
+    // Redirect to Google OAuth
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->stateless()->redirect();
+    }
+
+    // Handle Google OAuth callback
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
+
+            // Chercher l'utilisateur par email
+            $user = User::where('email', $googleUser->getEmail())->first();
+
+            // Si l'utilisateur n'existe pas, le créer
+            if (!$user) {
+                $user = User::create([
+                    'name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'password' => Hash::make(Str::random(24)), // Mot de passe aléatoire
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                ]);
+            } else {
+                // Mettre à jour le google_id si nécessaire
+                if (!$user->google_id) {
+                    $user->update([
+                        'google_id' => $googleUser->getId(),
+                    ]);
+                }
+            }
+
+            // Créer un token d'authentification
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            // Rediriger vers le frontend avec le token
+            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+            return redirect()->away("{$frontendUrl}/auth/callback?token={$token}");
+
+        } catch (\Exception $e) {
+            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+            return redirect()->away("{$frontendUrl}/login?error=" . urlencode('Erreur lors de la connexion avec Google'));
+        }
     }
 }

@@ -281,7 +281,8 @@ const handleRegister = async () => {
     const response = await authStore.register(name.value, email.value, password.value, confirmPassword.value)
     
     if (response.success) {
-      router.push('/')
+      // Redirection automatique vers la page de connexion
+      router.push('/login')
     } else {
       errorMessage.value = response.message
     }

@@ -17,6 +17,10 @@ use App\Http\Controllers\AdminController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Google OAuth
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
 // Posts
 Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/search', [PostController::class, 'search']);

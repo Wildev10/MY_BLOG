@@ -84,6 +84,11 @@ const router = createRouter({
       name: 'admin-categories',
       component: () => import('@/views/admin/AdminCategoriesView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/auth/callback',
+      name: 'auth-callback',
+      component: () => import('@/views/AuthCallbackView.vue')
     }
   ]
 })

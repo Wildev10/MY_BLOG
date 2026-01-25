@@ -99,6 +99,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // Définir le token depuis Google OAuth
+  const setTokenFromGoogle = async (googleToken) => {
+    token.value = googleToken
+    localStorage.setItem('token', googleToken)
+  }
+
   // Initialiser le store (charger l'utilisateur si token existe)
   if (token.value) {
     fetchUser()
@@ -112,6 +118,7 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     fetchUser,
-    refreshProfile
+    refreshProfile,
+    setTokenFromGoogle
   }
 })
