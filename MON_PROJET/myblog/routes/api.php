@@ -10,6 +10,9 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\FollowController;
 
 // ==================== ROUTES PUBLIQUES ====================
 
@@ -24,6 +27,7 @@ Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallbac
 // Posts
 Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/search', [PostController::class, 'search']);
+Route::get('/posts/popular', [PostController::class, 'popular']);
 Route::get('/posts/{id}', [PostController::class, 'show']);
 Route::get('/posts/{id}/comments', [CommentController::class, 'index']);
 
@@ -31,9 +35,16 @@ Route::get('/posts/{id}/comments', [CommentController::class, 'index']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slug}/posts', [CategoryController::class, 'posts']);
 
+// Tags
+Route::get('/tags', [TagController::class, 'index']);
+Route::get('/tags/popular', [TagController::class, 'popular']);
+Route::get('/tags/{slug}/posts', [TagController::class, 'posts']);
+
 // Profil public
 Route::get('/users/{username}', [ProfileController::class, 'publicProfile']);
 Route::get('/users/{username}/posts', [ProfileController::class, 'userPosts']);
+Route::get('/users/{username}/followers', [FollowController::class, 'followers']);
+Route::get('/users/{username}/following', [FollowController::class, 'following']);
 
 // ==================== ROUTES PROTÉGÉES ====================
 
@@ -54,29 +65,50 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // === Posts ===
-    Route::post('/posts', [PostController::class, 'store']);
+    Route::middleware('throttle:post')->group(function () {
+        Route::post('/posts', [PostController::class, 'store']);
+    });
     Route::put('/posts/{id}', [PostController::class, 'update']);
     Route::delete('/posts/{id}', [PostController::class, 'destroy']);
     Route::get('/my-posts', [PostController::class, 'myPosts']);
+    Route::get('/my-drafts', [PostController::class, 'myDrafts']);
 
     // === Catégories (admin) ===
     Route::post('/categories', [CategoryController::class, 'store']);
 
-    // === Likes ===
-    Route::post('/posts/{id}/like', [LikeController::class, 'toggle']);
+    // === Likes (avec rate limiting) ===
+    Route::middleware('throttle:like')->group(function () {
+        Route::post('/posts/{id}/like', [LikeController::class, 'toggle']);
+    });
     Route::get('/posts/{id}/likes', [LikeController::class, 'getLikes']);
 
-    // === Commentaires ===
-    Route::post('/posts/{id}/comments', [CommentController::class, 'store']);
+    // === Bookmarks ===
+    Route::get('/bookmarks', [BookmarkController::class, 'index']);
+    Route::post('/posts/{id}/bookmark', [BookmarkController::class, 'toggle']);
+    Route::get('/posts/{id}/bookmark/status', [BookmarkController::class, 'status']);
+
+    // === Commentaires (avec rate limiting) ===
+    Route::middleware('throttle:comment')->group(function () {
+        Route::post('/posts/{id}/comments', [CommentController::class, 'store']);
+    });
     Route::put('/comments/{id}', [CommentController::class, 'update']);
     Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
 
-    // NOUVEAU : Notifications
+    // === Follow ===
+    Route::post('/users/{username}/follow', [FollowController::class, 'toggle']);
+    Route::get('/users/{username}/follow/status', [FollowController::class, 'status']);
+    Route::get('/feed', [FollowController::class, 'feed']);
+
+    // === Notifications ===
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
     Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+
+    // === Tags (admin) ===
+    Route::post('/tags', [TagController::class, 'store']);
+    Route::delete('/tags/{id}', [TagController::class, 'destroy']);
 
     // ROUTES ADMIN (protégées par middleware admin)
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {

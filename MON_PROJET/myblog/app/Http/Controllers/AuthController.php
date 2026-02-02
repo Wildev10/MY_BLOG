@@ -16,15 +16,16 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'name' => ['required', 'string', 'max:255', 'min:2'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'username' => User::generateUsername($validated['name']),
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -43,8 +44,8 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validated = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+            'email' => ['required', 'string', 'email'],
+            'password' => ['required', 'string'],
         ]);
 
         $user = User::where('email', $validated['email'])->first();
@@ -52,6 +53,13 @@ class AuthController extends Controller
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Les identifiants sont incorrects.'],
+            ]);
+        }
+
+        // Vérifier si l'utilisateur est banni
+        if ($user->is_banned) {
+            throw ValidationException::withMessages([
+                'email' => ['Votre compte a été suspendu.'],
             ]);
         }
 
@@ -70,7 +78,11 @@ class AuthController extends Controller
     // Logout
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        // Supprimer le token courant (si c'est un vrai token, pas un TransientToken)
+        $token = $request->user()->currentAccessToken();
+        if ($token && method_exists($token, 'delete')) {
+            $token->delete();
+        }
 
         return response()->json([
             'success' => true,

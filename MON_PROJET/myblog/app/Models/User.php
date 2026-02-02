@@ -53,6 +53,8 @@ class User extends Authenticatable
         'posts_count',
         'comments_count',
         'last_post_date',
+        'followers_count',
+        'following_count',
     ];
 
 
@@ -153,6 +155,55 @@ class User extends Authenticatable
     public function unreadNotifications()
     {
         return $this->notifications()->where('is_read', false);
+    }
+
+    // Relation : Followers (ceux qui me suivent)
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id')
+            ->withTimestamps();
+    }
+
+    // Relation : Following (ceux que je suis)
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id')
+            ->withTimestamps();
+    }
+
+    // Relation : Bookmarks
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    // Relation : Posts bookmarkés
+    public function bookmarkedPosts()
+    {
+        return $this->belongsToMany(Post::class, 'bookmarks')->withTimestamps();
+    }
+
+    // Vérifier si je suis un utilisateur
+    public function isFollowing(User $user): bool
+    {
+        return $this->following()->where('following_id', $user->id)->exists();
+    }
+
+    // Vérifier si je suis suivi par un utilisateur
+    public function isFollowedBy(User $user): bool
+    {
+        return $this->followers()->where('follower_id', $user->id)->exists();
+    }
+
+    // Accessors pour les compteurs followers/following
+    public function getFollowersCountAttribute(): int
+    {
+        return $this->followers()->count();
+    }
+
+    public function getFollowingCountAttribute(): int
+    {
+        return $this->following()->count();
     }
 
     // ==================== MÉTHODES UTILITAIRES ====================

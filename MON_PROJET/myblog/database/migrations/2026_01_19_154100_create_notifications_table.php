@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');// L'utilisateur qui reçoit la notification
             $table->foreignId('from_user_id')->constrained('users')->onDelete('cascade'); // L'utilisateur qui a déclenché la notification
-            $table->string('type'); // 'like', 'comment', etc.
-            $table->foreignId('post_id')->constrained()->onDelete('cascade'); // Le post concerné
+            $table->string('type'); // 'like', 'comment', 'follow', etc.
+            $table->foreignId('post_id')->nullable()->constrained()->onDelete('cascade'); // Le post concerné (nullable pour les follows)
             $table->foreignId('comment_id')->nullable()->constrained()->onDelete('cascade'); // Peut être nul pour les notifications de type "like" sur un post
             $table->boolean('is_read')->default(false); // Lu ou non
             $table->timestamps();

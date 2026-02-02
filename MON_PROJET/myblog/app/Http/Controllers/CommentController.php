@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Comment;
 use App\Models\Notification;
+use App\Http\Requests\StoreCommentRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -16,7 +17,7 @@ class CommentController extends Controller
         $post = Post::findOrFail($postId);
 
         $comments = $post->comments()
-            ->with('user:id,name') // Charger uniquement id et name de l'utilisateur
+            ->with('user:id,name,username,avatar')
             ->paginate(10);
 
         return response()->json([
@@ -26,13 +27,11 @@ class CommentController extends Controller
     }
 
     // POST /api/posts/{id}/comments - Créer un commentaire
-    public function store(Request $request, $postId)
+    public function store(StoreCommentRequest $request, $postId)
     {
         $post = Post::findOrFail($postId);
 
-        $validated = $request->validate([
-            'content' => 'required|string|max:1000'
-        ]);
+        $validated = $request->validated();
 
         $comment = Comment::create([
             'user_id' => $request->user()->id,
@@ -40,15 +39,13 @@ class CommentController extends Controller
             'content' => $validated['content']
         ]);
 
-        // Charger la relation user pour la réponse
-        $comment->load('user:id,name');
+        $comment->load('user:id,name,username,avatar');
 
-
-        // NOUVEAU : Créer une notification (sauf si c'est son propre article)
+        // Créer une notification (sauf si c'est son propre article)
         if ($post->user_id !== $request->user()->id) {
             Notification::create([
-                'user_id' => $post->user_id, // L'auteur de l'article
-                'from_user_id' => $request->user()->id, // Celui qui commente
+                'user_id' => $post->user_id,
+                'from_user_id' => $request->user()->id,
                 'type' => 'comment',
                 'post_id' => $postId,
                 'comment_id' => $comment->id
@@ -63,24 +60,15 @@ class CommentController extends Controller
     }
 
     // PUT /api/comments/{id} - Modifier un commentaire
-    public function update(Request $request, $id)
+    public function update(StoreCommentRequest $request, $id)
     {
         $comment = Comment::findOrFail($id);
 
-        // Vérifier que l'utilisateur est bien l'auteur du commentaire
-        if ($comment->user_id !== $request->user()->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Vous n\'êtes pas autorisé à modifier ce commentaire'
-            ], Response::HTTP_FORBIDDEN);
-        }
+        // Vérification via Policy
+        $this->authorize('update', $comment);
 
-        $validated = $request->validate([
-            'content' => 'required|string|max:1000'
-        ]);
-
-        $comment->update($validated);
-        $comment->load('user:id,name');
+        $comment->update($request->validated());
+        $comment->load('user:id,name,username,avatar');
 
         return response()->json([
             'success' => true,
@@ -94,13 +82,11 @@ class CommentController extends Controller
     {
         $comment = Comment::findOrFail($id);
 
-        // Vérifier que l'utilisateur est bien l'auteur
-        if ($comment->user_id !== $request->user()->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Vous n\'êtes pas autorisé à supprimer ce commentaire'
-            ], Response::HTTP_FORBIDDEN);
-        }
+        // Vérification via Policy (auteur du commentaire, auteur du post, ou admin)
+        $this->authorize('delete', $comment);
+
+        // Supprimer la notification associée
+        Notification::where('comment_id', $comment->id)->delete();
 
         $comment->delete();
 
